@@ -1,7 +1,8 @@
 name: Deploy ELK
+
 on:
   push:
-    branches: ["testing"]
+    branches: [ "testing" ]
   workflow_dispatch:
 
 jobs:
@@ -16,11 +17,12 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           port: ${{ secrets.SSH_PORT }}
           script: |
-            set -e
-            cd /opt/ELK
-            git pull
-            docker compose up -d
-            docker compose ps
-            curl -s http://localhost:9200 >/dev/null
-            curl -s http://localhost:5601 >/dev/null
-            echo "Deploy OK"
+            echo ls
+            # set -e
+            # cd /opt/ELK
+            # git pull
+            # docker compose up -d
+            # docker compose ps
+            # curl -s http://localhost:9200 >/dev/null
+            # curl -s http://localhost:5601 >/dev/null
+            # echo "Deploy OK"
