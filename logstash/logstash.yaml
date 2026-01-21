@@ -1,7 +1,17 @@
-http.host: "0.0.0.0"
-log.level: info
+services:
+  logstash:
+    image: logstash:9.2.4
+    container_name: logstash
+    restart: unless-stopped
 
-pipeline.workers: 2
-pipeline.batch.size: 125
+    volumes:
+      - ./pipeline:/usr/share/logstash/pipeline
+      - ./config/logstash.yml:/usr/share/logstash/config/logstash.yml
 
-xpack.monitoring.enabled: false
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+
+    environment:
+      LS_JAVA_OPTS: "-Xms512m -Xmx512m"
+
