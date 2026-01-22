@@ -102,6 +102,8 @@ jobs:
           sleep 15
           docker compose ps
           echo "Logstash container OK"
+          docker compose -f logstash/logstash.yml up -d
+          echo "Logstash down"
 
   test_pipeline:
     needs: detect
@@ -116,6 +118,8 @@ jobs:
           sleep 20
           curl -s http://localhost:9200/_cat/indices?v | head -n 20
           echo "Pipeline OK (indices listed)"
+          docker compose -f logstash/logstash.yml up -d
+          echo "Logstash down"
 
   test_compose:
     needs: detect
