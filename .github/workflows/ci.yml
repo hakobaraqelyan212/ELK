@@ -49,11 +49,11 @@ jobs:
       - name: Start Elasticsearch
         run: |
           set -e
-          docker compose -f elasticsearch/elasticsearch.yml up -d
+          docker compose up -d
           sleep 10
           curl -s http://localhost:9200 >/dev/null
           echo "ES OK"
-          docker compose -f elasticsearch/elasticsearch.yml down
+          docker compose down
           echo "ES down"
 
   test_kibana:
