@@ -49,10 +49,14 @@ jobs:
       - name: Start Elasticsearch
         run: |
           set -e
-          docker compose -f elasticsearch/elasticsearch.yml up -d
+          docker compose up -d
           sleep 10
           curl -s http://localhost:9200 >/dev/null
           echo "ES OK"
+          docker compose down
+          sleep 5
+          curl -s http://localhost:9200 && exit 1 ||  true
+          echo "ES down/up OK"
 
   test_kibana:
     needs: detect
@@ -81,6 +85,10 @@ jobs:
           sleep 15
           docker compose ps
           echo "Logstash container OK"
+          docker compose -f logstash/logstash.yml down
+          sleep 5
+          docker compose -f logstash/logstash.yml ps
+          echo "Logstash down/up OK"
 
   test_pipeline:
     needs: detect
@@ -108,7 +116,13 @@ jobs:
           docker compose up -d
           sleep 15
           docker compose ps
-          echo "Logstash container OK"
+          echo "ES container OK"
+          curl -s http://localhost:9200 | head -n 2
+          echo "ES OK"
+          docker compose down
+          sleep 5
+          docker compose ps
+          echo "ES down/up OK"
 
   test_actions:
     needs: detect
