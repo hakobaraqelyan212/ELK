@@ -49,13 +49,11 @@ jobs:
       - name: Start Elasticsearch
         run: |
           set -e
-          docker compose up -d
-          sleep 10
-          curl -s http://localhost:9200 >/dev/null
-          echo "ES OK"
-          docker compose down
-          sleep 5
-          curl -s http://localhost:9200 && exit 1 ||  true
+          docker compose up -d && \
+          docker inspect elasticsearch | grep healthy >/dev/null && \echo "Elasticsearch HEALTHY" || exit 1 && \
+          echo "ES OK"  && \
+          docker compose down && \
+          docker inspect elasticsearch && \
           echo "ES down/up OK"
 
   test_kibana:
@@ -67,10 +65,12 @@ jobs:
       - name: Start Kibana
         run: |
           set -e
-          docker compose -f kibana/kibana.yml up -d
-          sleep 20
-          curl -s http://localhost:5601 | head -n 2
-          echo "Kibana OK"
+          docker compose up -d && \
+          docker inspect kibana | grep healthy >/dev/null && \echo "Kibana HEALTHY" || exit 1 && \
+          echo "Kibana container OK"  && \
+          docker compose down && \
+          docker inspect kibana && \
+          echo "Kibana down/up OK"
 
   test_logstash:
     needs: detect
@@ -81,13 +81,11 @@ jobs:
       - name: Start Logstash
         run: |
           set -e
-          docker compose -f logstash/logstash.yml up -d
-          sleep 15
-          docker compose ps
-          echo "Logstash container OK"
-          docker compose -f logstash/logstash.yml down
-          sleep 5
-          docker compose -f logstash/logstash.yml ps
+          docker compose -f logstash/logstash.yml up -d && \
+          docker inspect -f '{{.State.Health.Status}}' logstash | grep healthy >/dev/null && \echo "Logstash HEALTHY" || exit 1 && \
+          echo "Logstash container OK"  && \
+          docker compose -f logstash/logstash.yml down  && \
+          docker inspect -f '{{.State.Health.Status}}' logstash
           echo "Logstash down/up OK"
 
   test_pipeline:
@@ -99,10 +97,14 @@ jobs:
       - name: Start logstash and test pipeline
         run: |
           set -e
-          docker compose -f logstash/logstash.yml up -d
-          sleep 20
-          curl -s http://localhost:9200/_cat/indices?v | head -n 20
-          echo "Pipeline OK (indices listed)"
+          docker compose -f logstash/logstash.yml up -d && \
+          docker inspect -f '{{.State.Health.Status}}' logstash | grep healthy >/dev/null && \echo "Logstash HEALTHY" || exit 1 && \
+          echo "Logstash container OK"  && \
+          docker logs logstash | grep pipeline && \
+          echo "Pipeline OK (indices listed)" && \
+          docker compose -f logstash/logstash.yml down  && \
+          docker inspect -f '{{.State.Health.Status}}' logstash
+          echo "Logstash down/up OK"
 
   test_compose:
     needs: detect
@@ -113,16 +115,18 @@ jobs:
       - name: Start Elasticsearch + Logstash
         run: |
           set -e
-          docker compose up -d
-          sleep 15
-          docker compose ps
-          echo "ES container OK"
-          curl -s http://localhost:9200 | head -n 2
-          echo "ES OK"
-          docker compose down
-          sleep 5
-          docker compose ps
-          echo "ES down/up OK"
+          docker compose up -d && \
+          docker inspect elasticsearch | grep healthy >/dev/null && \echo "Elasticsearch HEALTHY" || exit 1 && \
+          echo "Elasticsearch container OK"  && \
+          docker inspect kibana | grep healthy >/dev/null && \echo "Kibana HEALTHY" || exit 1 && \
+          echo "Kibana container OK"  && \
+          docker inspect logstash | grep healthy >/dev/null && \echo "Logstash HEALTHY" || exit 1 && \
+          echo "Logstash container OK"  && \
+          docker compose down && \
+          docker inspect elasticsearch && \
+          docker inspect kibana && \
+          docker inspect logstash && \
+          echo "ES, Kibana and Logstash down/up OK"
 
   test_actions:
     needs: detect
