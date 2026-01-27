@@ -102,11 +102,6 @@ jobs:
           sleep 15
           docker compose ps
           echo "Logstash container OK"
-<<<<<<< HEAD
-=======
-          docker compose -f logstash/logstash.yml down
-          echo "Logstash down"
->>>>>>> da40ca4 (change workflow add down for testing container)
 
   test_pipeline:
     needs: detect
@@ -121,11 +116,6 @@ jobs:
           sleep 20
           curl -s http://localhost:9200/_cat/indices?v | head -n 20
           echo "Pipeline OK (indices listed)"
-<<<<<<< HEAD
-=======
-          docker compose -f logstash/logstash.yml down
-          echo "Logstash down"
->>>>>>> da40ca4 (change workflow add down for testing container)
 
   test_compose:
     needs: detect
