@@ -1,0 +1,27 @@
+1. Разрешить чтение Logstash-пользователю:
+
+sudo setfacl -m u:1000:r /var/log/syslog
+
+2. Как проверить, что Logstash теперь читает файл
+В контейнере:
+
+docker exec -it logstash bash
+
+cat /host_logs/syslog | head
+
+3. После изменения прав
+
+docker compose restart logstash
+docker logs -f logstash
+
+Ты должен увидеть:
+
+- отсутствие EACCES
+- появление событий в stdout { rubydebug }
+
+4. Проверка в Elasticsearch
+
+docker exec -it elasticsearch \
+  curl "http://elasticsearch:9200/host-syslog-*/_count?pretty"
+
+Если count > 0 — всё работает.

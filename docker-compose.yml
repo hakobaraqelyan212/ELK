@@ -36,6 +36,23 @@ services:
     networks:
       - elk
 
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.15.0
+    container_name: logstash
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline:ro
+      - ./logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:ro
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml:ro
+      - /var/log:/host_logs:ro
+    ports:
+      - "5044:5044"
+      - "514:514/udp"
+      - "9600:9600"
+    networks:
+      - elk
+
 volumes:
   esdata:
 
