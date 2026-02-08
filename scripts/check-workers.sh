@@ -85,9 +85,16 @@ index=0
 while [[ $wait_time -lt $timer ]]; do
   echo "Waiting for container to be ready..."
   
-  echo "Checking container ${containers[index]} with expected status: ${statuses[index]}"
+  echo "Checking container ${containers[index]}"
+  echo "Status: ${statuses[index]}"
+  echo "Expected working status: ${statuses_working[index]}"
+  echo "Wait time: ${wait_time}s / ${timer}s"
+  echo "Interval: ${interval}s"
+  echo "Index: $index / $c_len"
+  echo "----------------------------------------"
+  echo
 
-  if [[ (( ""$statuses[index]"" == "${statuses_working[index]}" )) ]]; then
+  if [[ (( "${statuses[index]}" == "${statuses_working[index]}" )) ]]; then
     echo "container ${containers[index]} is ready with status: ${statuses[index]}"
     
     index=$((index + 1))
@@ -95,6 +102,7 @@ while [[ $wait_time -lt $timer ]]; do
       echo "All containers are ready."
       exit 0
     fi
+    return 0
   fi
   
   sleep "$interval"
