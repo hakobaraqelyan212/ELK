@@ -13,7 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-  test_es:
+  run_dockers:
     needs: detect
     runs-on: self-hosted
     steps:
@@ -26,8 +26,8 @@ jobs:
           set -e
           chmod +x ./scripts/check-container.sh && \
           ./scripts/check-container.sh -n elasticsearch kibana logstash
-  run_dockers:
-    needs: test_es
+  test_dockers:
+    needs: run_dockers
     runs-on: self-hosted
     steps:
       - uses: actions/checkout@v4
